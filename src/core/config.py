@@ -9,384 +9,259 @@ Version: 1.0.0
 """
 
 import os
-from typing import Dict, List, Any, Optional, Union
-from dataclasses import dataclass, field
+from typing import Dict, List, Any
 
-from pydantic import BaseModel, Field, validator
-from pydantic.env_settings import BaseSettings
+# =============================================================================
+# 🚀 TRAFFICFLOU CONFIGURATION - ENHANCED GAMEDIN.XYZ MULTI-PAGE TARGETING
+# =============================================================================
+# Configuration for TrafficFlou with comprehensive GameDin.xyz page targeting
+# Features: 7x traffic increase, exponential acceleration, multi-page routing
+# =============================================================================
 
-
-class AIModelConfig(BaseModel):
-    """Base configuration for AI models."""
+class TrafficFlouConfig:
+    """Enhanced configuration for TrafficFlou with multi-page GameDin.xyz targeting"""
     
-    model_name: str = Field(default="gpt-4", description="AI model name")
-    api_key: str = Field(default="", description="API key for the model")
-    max_tokens: int = Field(default=1000, description="Maximum tokens for responses")
-    temperature: float = Field(default=0.7, description="Temperature for generation")
-    timeout: int = Field(default=30, description="Request timeout in seconds")
-    max_retries: int = Field(default=3, description="Maximum retry attempts")
-    retry_delay: float = Field(default=1.0, description="Delay between retries")
-    confidence_threshold: float = Field(default=0.7, description="Minimum confidence threshold")
-
-
-class TrafficConfig(BaseModel):
-    """Configuration for traffic generation."""
+    # =============================================================================
+    # 🎯 PRIMARY TARGETS - GAMEDIN.XYZ MULTI-PAGE SYSTEM
+    # =============================================================================
     
-    request_timeout: int = Field(default=30, description="HTTP request timeout")
-    max_concurrent_requests: int = Field(default=10, description="Maximum concurrent requests")
-    user_agent_rotation: bool = Field(default=True, description="Enable user agent rotation")
-    proxy_enabled: bool = Field(default=False, description="Enable proxy support")
-    proxy_list: List[str] = Field(default_factory=list, description="List of proxy servers")
-    request_delay: float = Field(default=1.0, description="Delay between requests")
-    max_requests_per_session: int = Field(default=50, description="Maximum requests per session")
-
-
-class BehaviorConfig(BaseModel):
-    """Configuration for behavior simulation."""
+    # Main GameDin.xyz pages with comprehensive targeting
+    GAMEDIN_PAGES = {
+        "main": "https://gamedin.xyz",
+        "psychotherapy_shepard": "https://gamedin.xyz/psychotherapy-shepard",
+        "primal_genesis_engine": "https://gamedin.xyz/primal-genesis-engine%E2%84%A2",
+        "novasanctum_systems": "https://gamedin.xyz/novasanctum-systems", 
+        "mkworldwide_inc": "https://gamedin.xyz/mkworldwide-inc",
+        "about": "https://gamedin.xyz/about",
+        "support": "https://gamedin.xyz/support",
+        "projects": "https://gamedin.xyz/projects"
+    }
     
-    behavior_types: List[str] = Field(
-        default_factory=lambda: ["browsing", "clicking", "scrolling", "form_filling"],
-        description="Available behavior types"
-    )
-    user_profiles: List[str] = Field(
-        default_factory=lambda: ["casual", "focused", "researcher", "shopper"],
-        description="Available user profile types"
-    )
-    interaction_patterns: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Interaction pattern configurations"
-    )
-    realism_level: int = Field(default=3, description="Realism level (1-5)")
-    randomization_factor: float = Field(default=0.3, description="Randomization factor")
-
-
-class PhantomFlairConfig(BaseModel):
-    """Configuration for Phantom Flair capabilities."""
-    
-    enabled: bool = Field(default=True, description="Enable Phantom Flair")
-    intensity: float = Field(default=0.7, description="Phantom Flair intensity (0.0-1.0)")
-    sophistication_level: int = Field(default=3, description="Sophistication level (1-5)")
-    
-    # Flair patterns
-    patterns: List[str] = Field(
-        default_factory=lambda: [
-            "organic_browsing", "social_engagement", "ecommerce_exploration",
-            "content_consumption", "research_patterns", "casual_navigation",
-            "phantom_navigation", "flair_interaction", "athena_insight"
-        ],
-        description="Available Phantom Flair patterns"
-    )
-    
-    # Timing and pacing
-    min_delay: float = Field(default=0.5, description="Minimum delay between interactions")
-    max_delay: float = Field(default=3.0, description="Maximum delay between interactions")
-    natural_pacing: bool = Field(default=True, description="Enable natural pacing")
-    context_aware_timing: bool = Field(default=True, description="Enable context-aware timing")
-    
-    # Interaction sophistication
-    hover_effects: bool = Field(default=True, description="Enable hover effects")
-    scroll_behavior: bool = Field(default=True, description="Enable scroll behavior")
-    click_patterns: bool = Field(default=True, description="Enable click patterns")
-    form_interactions: bool = Field(default=True, description="Enable form interactions")
-    
-    # Adaptive learning
-    learning_enabled: bool = Field(default=True, description="Enable adaptive learning")
-    pattern_adaptation: bool = Field(default=True, description="Enable pattern adaptation")
-    context_memory: bool = Field(default=True, description="Enable context memory")
-    
-    # Phantom Flair specific
-    flair_randomization: bool = Field(default=True, description="Enable flair randomization")
-    intensity_variation: float = Field(default=0.2, description="Intensity variation factor")
-    pattern_evolution: bool = Field(default=True, description="Enable pattern evolution")
-
-
-class AnalyticsConfig(BaseModel):
-    """Configuration for analytics and metrics."""
-    
-    enabled: bool = Field(default=True, description="Enable analytics")
-    storage_backend: str = Field(default="memory", description="Storage backend type")
-    metrics_interval: int = Field(default=60, description="Metrics collection interval")
-    retention_period: int = Field(default=86400, description="Data retention period")
-    real_time_monitoring: bool = Field(default=True, description="Enable real-time monitoring")
-
-
-class SecurityConfig(BaseModel):
-    """Configuration for security and privacy."""
-    
-    traffic_obfuscation: bool = Field(default=True, description="Enable traffic obfuscation")
-    user_agent_randomization: bool = Field(default=True, description="Enable user agent randomization")
-    privacy_protection: bool = Field(default=True, description="Enable privacy protection")
-    request_encryption: bool = Field(default=False, description="Enable request encryption")
-    fingerprint_protection: bool = Field(default=True, description="Enable fingerprint protection")
-
-
-class TrafficFlouConfig(BaseSettings):
-    """
-    🚀 TrafficFlou System Configuration
-    
-    Comprehensive configuration for the TrafficFlou system, including
-    Athena AI model integration and Phantom Flair capabilities.
-    
-    Environment Variables:
-    - TRAFFICFLOU_LOG_LEVEL: Logging level
-    - TRAFFICFLOU_OPENAI_API_KEY: OpenAI API key
-    - TRAFFICFLOU_ANTHROPIC_API_KEY: Anthropic API key
-    - TRAFFICFLOU_ATHENA_API_KEY: Athena API key
-    - TRAFFICFLOU_ATHENA_ENDPOINT: Athena API endpoint
-    - TRAFFICFLOU_PHANTOM_FLAIR_ENABLED: Enable Phantom Flair
-    - TRAFFICFLOU_PHANTOM_FLAIR_INTENSITY: Phantom Flair intensity
-    """
-    
-    # Core system settings
-    log_level: str = Field(default="INFO", description="Logging level")
-    debug_mode: bool = Field(default=False, description="Enable debug mode")
-    
-    # Default target configuration
-    default_target_url: str = Field(default="https://gamedin.xyz", description="Default target website")
-    default_session_duration: int = Field(default=600, description="Default session duration in seconds")
-    default_traffic_volume: int = Field(default=100, description="Default traffic volume per session")
-    
-    # Instagram routing configuration
-    instagram_routing_enabled: bool = Field(default=True, description="Enable Instagram traffic routing")
-    instagram_targets: List[str] = Field(
-        default_factory=lambda: ["@M.K.Lux", "@TheSovereignSunny"],
-        description="Instagram accounts to route traffic to"
-    )
-    instagram_routing_ratio: float = Field(default=0.3, description="Ratio of traffic to route to Instagram")
-    instagram_session_duration: int = Field(default=300, description="Instagram session duration in seconds")
-    instagram_traffic_volume: int = Field(default=50, description="Instagram traffic volume per session")
-    
-    # AI Model configurations
-    openai_api_key: str = Field(default="", description="OpenAI API key")
-    openai_model_name: str = Field(default="gpt-4", description="OpenAI model name")
-    openai_config: AIModelConfig = Field(default_factory=AIModelConfig, description="OpenAI configuration")
-    
-    anthropic_api_key: str = Field(default="", description="Anthropic API key")
-    anthropic_model_name: str = Field(default="claude-3-sonnet", description="Anthropic model name")
-    anthropic_config: AIModelConfig = Field(default_factory=AIModelConfig, description="Anthropic configuration")
-    
-    # Athena AI Model configuration
-    athena_api_key: str = Field(default="", description="Athena API key")
-    athena_model_name: str = Field(default="athena-v2.0", description="Athena model name")
-    athena_endpoint: str = Field(default="https://api.athena.ai/v1", description="Athena API endpoint")
-    athena_model_version: str = Field(default="athena-v2.0", description="Athena model version")
-    athena_config: AIModelConfig = Field(default_factory=AIModelConfig, description="Athena configuration")
-    
-    # Phantom Flair configuration
-    phantom_flair_enabled: bool = Field(default=True, description="Enable Phantom Flair capabilities")
-    phantom_flair_intensity: float = Field(default=0.8, description="Phantom Flair intensity")
-    phantom_flair_sophistication: int = Field(default=4, description="Phantom Flair sophistication level")
-    phantom_flair_patterns: List[str] = Field(
-        default_factory=lambda: [
-            "organic_browsing", "social_engagement", "ecommerce_exploration",
-            "content_consumption", "research_patterns", "casual_navigation",
-            "phantom_navigation", "flair_interaction", "athena_insight"
-        ],
-        description="Phantom Flair patterns"
-    )
-    phantom_flair_learning: bool = Field(default=True, description="Enable Phantom Flair learning")
-    phantom_flair_adaptation: bool = Field(default=True, description="Enable Phantom Flair adaptation")
-    phantom_flair_config: PhantomFlairConfig = Field(
-        default_factory=PhantomFlairConfig,
-        description="Phantom Flair configuration"
-    )
-    
-    # Component configurations
-    traffic_config: TrafficConfig = Field(default_factory=TrafficConfig, description="Traffic generation configuration")
-    behavior_config: BehaviorConfig = Field(default_factory=BehaviorConfig, description="Behavior simulation configuration")
-    analytics_config: AnalyticsConfig = Field(default_factory=AnalyticsConfig, description="Analytics configuration")
-    security_config: SecurityConfig = Field(default_factory=SecurityConfig, description="Security configuration")
-    
-    # Session management
-    max_concurrent_sessions: int = Field(default=15, description="Maximum concurrent sessions")
-    session_timeout: int = Field(default=3600, description="Session timeout in seconds")
-    
-    # Performance settings
-    max_workers: int = Field(default=6, description="Maximum worker threads")
-    request_rate_limit: int = Field(default=200, description="Request rate limit per minute")
-    memory_limit: int = Field(default=2048, description="Memory limit in MB")
-    
-    # Advanced settings
-    enable_metrics: bool = Field(default=True, description="Enable metrics collection")
-    enable_logging: bool = Field(default=True, description="Enable structured logging")
-    enable_security: bool = Field(default=True, description="Enable security features")
-    
-    # Gaming-specific settings
-    gaming_mode_enabled: bool = Field(default=True, description="Enable gaming-optimized settings")
-    gaming_user_profiles: List[str] = Field(
-        default_factory=lambda: ["gamer", "casual_player", "competitive_player", "streamer"],
-        description="Gaming-specific user profiles"
-    )
-    gaming_behavior_patterns: List[str] = Field(
-        default_factory=lambda: ["game_browsing", "community_engagement", "tournament_research", "stream_watching"],
-        description="Gaming-specific behavior patterns"
-    )
-    
-    class Config:
-        env_prefix = "TRAFFICFLOU_"
-        case_sensitive = False
-    
-    @validator('phantom_flair_intensity')
-    def validate_phantom_flair_intensity(cls, v):
-        """Validate Phantom Flair intensity."""
-        if not 0.0 <= v <= 1.0:
-            raise ValueError('Phantom Flair intensity must be between 0.0 and 1.0')
-        return v
-    
-    @validator('phantom_flair_sophistication')
-    def validate_phantom_flair_sophistication(cls, v):
-        """Validate Phantom Flair sophistication level."""
-        if not 1 <= v <= 5:
-            raise ValueError('Phantom Flair sophistication must be between 1 and 5')
-        return v
-    
-    @validator('log_level')
-    def validate_log_level(cls, v):
-        """Validate log level."""
-        valid_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
-        if v.upper() not in valid_levels:
-            raise ValueError(f'Log level must be one of: {valid_levels}')
-        return v.upper()
-    
-    def get_ai_model_config(self, model_name: str) -> AIModelConfig:
-        """
-        Get configuration for a specific AI model.
-        
-        Args:
-            model_name (str): Name of the AI model
-            
-        Returns:
-            AIModelConfig: Model-specific configuration
-        """
-        if model_name.lower() == "openai":
-            return self.openai_config
-        elif model_name.lower() == "anthropic":
-            return self.anthropic_config
-        elif model_name.lower() == "athena":
-            return self.athena_config
-        else:
-            return AIModelConfig()
-    
-    def is_phantom_flair_enabled(self) -> bool:
-        """Check if Phantom Flair is enabled."""
-        return self.phantom_flair_enabled and self.athena_api_key
-    
-    def get_phantom_flair_config(self) -> PhantomFlairConfig:
-        """Get Phantom Flair configuration."""
-        config = self.phantom_flair_config.copy()
-        config.enabled = self.phantom_flair_enabled
-        config.intensity = self.phantom_flair_intensity
-        config.sophistication_level = self.phantom_flair_sophistication
-        config.patterns = self.phantom_flair_patterns
-        config.learning_enabled = self.phantom_flair_learning
-        config.pattern_adaptation = self.phantom_flair_adaptation
-        return config
-    
-    def validate_configuration(self) -> List[str]:
-        """
-        Validate the configuration and return any errors.
-        
-        Returns:
-            List[str]: List of validation errors
-        """
-        errors = []
-        
-        # Check for at least one AI model
-        if not any([self.openai_api_key, self.anthropic_api_key, self.athena_api_key]):
-            errors.append("At least one AI model API key must be configured")
-        
-        # Check Phantom Flair requirements
-        if self.phantom_flair_enabled and not self.athena_api_key:
-            errors.append("Athena API key required for Phantom Flair capabilities")
-        
-        # Check session limits
-        if self.max_concurrent_sessions <= 0:
-            errors.append("Maximum concurrent sessions must be greater than 0")
-        
-        if self.session_timeout <= 0:
-            errors.append("Session timeout must be greater than 0")
-        
-        # Check performance limits
-        if self.max_workers <= 0:
-            errors.append("Maximum workers must be greater than 0")
-        
-        if self.request_rate_limit <= 0:
-            errors.append("Request rate limit must be greater than 0")
-        
-        return errors
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert configuration to dictionary."""
-        return {
-            "log_level": self.log_level,
-            "debug_mode": self.debug_mode,
-            "default_target_url": self.default_target_url,
-            "phantom_flair_enabled": self.phantom_flair_enabled,
-            "phantom_flair_intensity": self.phantom_flair_intensity,
-            "phantom_flair_sophistication": self.phantom_flair_sophistication,
-            "max_concurrent_sessions": self.max_concurrent_sessions,
-            "session_timeout": self.session_timeout,
-            "default_session_duration": self.default_session_duration,
-            "max_workers": self.max_workers,
-            "request_rate_limit": self.request_rate_limit,
-            "enable_metrics": self.enable_metrics,
-            "enable_logging": self.enable_logging,
-            "enable_security": self.enable_security,
-            "gaming_mode_enabled": self.gaming_mode_enabled,
-            "ai_models_configured": {
-                "openai": bool(self.openai_api_key),
-                "anthropic": bool(self.anthropic_api_key),
-                "athena": bool(self.athena_api_key)
-            }
+    # Enhanced traffic settings with 7x increase
+    TRAFFIC_SETTINGS = {
+        "base_rate_per_minute": 70,  # 7x increase from 10
+        "exponential_factor": 2.0,   # Increased from 1.5
+        "max_concurrent_sessions": 21,  # 7x increase from 3
+        "session_duration_range": (300, 900),  # 5-15 minutes
+        "request_delay_range": (0.5, 2.0),  # Faster requests
+        "page_visit_weight": {
+            "main": 0.25,  # 25% of traffic to main page
+            "psychotherapy_shepard": 0.20,  # 20% to therapy page
+            "primal_genesis_engine": 0.20,  # 20% to engine page
+            "novasanctum_systems": 0.15,  # 15% to systems page
+            "mkworldwide_inc": 0.15,  # 15% to company page
+            "about": 0.03,  # 3% to about
+            "support": 0.01,  # 1% to support
+            "projects": 0.01   # 1% to projects
         }
-
-
-def load_config_from_env() -> TrafficFlouConfig:
-    """
-    Load configuration from environment variables.
+    }
     
-    Returns:
-        TrafficFlouConfig: Loaded configuration
-    """
-    return TrafficFlouConfig()
-
-
-def load_config_from_file(config_path: str) -> TrafficFlouConfig:
-    """
-    Load configuration from file.
+    # =============================================================================
+    # 📱 INSTAGRAM TARGETS - ENHANCED ROUTING
+    # =============================================================================
     
-    Args:
-        config_path (str): Path to configuration file
-        
-    Returns:
-        TrafficFlouConfig: Loaded configuration
-    """
-    # This would implement file-based configuration loading
-    # For now, return environment-based configuration
-    return load_config_from_env()
-
-
-def validate_and_load_config(config_source: str = "env") -> TrafficFlouConfig:
-    """
-    Validate and load configuration.
+    INSTAGRAM_ACCOUNTS = [
+        "@M.K.Lux",
+        "@TheSovereignSunny"
+    ]
     
-    Args:
-        config_source (str): Configuration source ("env" or file path)
+    INSTAGRAM_SETTINGS = {
+        "base_rate_per_minute": 35,  # 7x increase from 5
+        "exponential_factor": 2.0,
+        "max_concurrent_sessions": 14,  # 7x increase from 2
+        "session_duration_range": (180, 600),
+        "request_delay_range": (1.0, 3.0)
+    }
+    
+    # =============================================================================
+    # 🧠 AI MODEL CONFIGURATION
+    # =============================================================================
+    
+    AI_MODELS = {
+        "athena": {
+            "enabled": True,
+            "api_key": os.getenv("ATHENA_API_KEY", ""),
+            "model": "athena-v1",
+            "max_tokens": 2048,
+            "temperature": 0.7
+        },
+        "openai": {
+            "enabled": True,
+            "api_key": os.getenv("OPENAI_API_KEY", ""),
+            "model": "gpt-4",
+            "max_tokens": 1024,
+            "temperature": 0.8
+        },
+        "anthropic": {
+            "enabled": True,
+            "api_key": os.getenv("ANTHROPIC_API_KEY", ""),
+            "model": "claude-3-sonnet-20240229",
+            "max_tokens": 1024,
+            "temperature": 0.7
+        }
+    }
+    
+    # =============================================================================
+    # 🎮 GAMING USER PROFILES - ENHANCED FOR GAMEDIN.XYZ
+    # =============================================================================
+    
+    GAMING_USER_PROFILES = {
+        "competitive_player": {
+            "age_range": "16-24",
+            "interests": ["esports", "competitive_gaming", "tournaments"],
+            "behavior_patterns": ["aggressive_browsing", "rapid_navigation", "detail_analysis"],
+            "session_duration": 600,  # 10 minutes
+            "request_rate": 22,  # requests per minute
+            "target_pages": ["main", "primal_genesis_engine", "projects"]
+        },
+        "casual_gamer": {
+            "age_range": "25-35", 
+            "interests": ["casual_gaming", "community", "social_gaming"],
+            "behavior_patterns": ["exploratory_browsing", "social_interaction", "content_consumption"],
+            "session_duration": 480,  # 8 minutes
+            "request_rate": 18,
+            "target_pages": ["main", "psychotherapy_shepard", "about"]
+        },
+        "gaming_enthusiast": {
+            "age_range": "18-30",
+            "interests": ["gaming_technology", "innovation", "future_gaming"],
+            "behavior_patterns": ["technical_analysis", "deep_reading", "research_oriented"],
+            "session_duration": 720,  # 12 minutes
+            "request_rate": 20,
+            "target_pages": ["main", "novasanctum_systems", "primal_genesis_engine"]
+        },
+        "business_gamer": {
+            "age_range": "30-45",
+            "interests": ["gaming_business", "investment", "industry_analysis"],
+            "behavior_patterns": ["business_analysis", "strategic_thinking", "market_research"],
+            "session_duration": 540,  # 9 minutes
+            "request_rate": 16,
+            "target_pages": ["main", "mkworldwide_inc", "about"]
+        },
+        "therapy_seeker": {
+            "age_range": "20-40",
+            "interests": ["mental_health", "healing", "personal_growth"],
+            "behavior_patterns": ["contemplative_browsing", "emotional_engagement", "support_seeking"],
+            "session_duration": 600,  # 10 minutes
+            "request_rate": 15,
+            "target_pages": ["psychotherapy_shepard", "main", "support"]
+        },
+        "tech_innovator": {
+            "age_range": "25-40",
+            "interests": ["technology", "innovation", "systems_design"],
+            "behavior_patterns": ["technical_exploration", "innovation_research", "system_analysis"],
+            "session_duration": 660,  # 11 minutes
+            "request_rate": 19,
+            "target_pages": ["primal_genesis_engine", "novasanctum_systems", "main"]
+        }
+    }
+    
+    # =============================================================================
+    # 🔄 EXPONENTIAL ACCELERATION SETTINGS
+    # =============================================================================
+    
+    ACCELERATION_SETTINGS = {
+        "enabled": True,
+        "base_multiplier": 7.0,  # 7x base increase
+        "exponential_growth_rate": 1.8,  # Increased growth rate
+        "max_cycles": 50,  # More cycles for sustained growth
+        "cycle_duration": 300,  # 5 minutes per cycle
+        "phase_increase_factor": 1.5,  # Each phase increases by 50%
+        "adaptive_scaling": True,
+        "performance_thresholds": {
+            "cpu_usage": 80.0,
+            "memory_usage": 85.0,
+            "network_usage": 90.0
+        }
+    }
+    
+    # =============================================================================
+    # 📊 ANALYTICS AND MONITORING
+    # =============================================================================
+    
+    ANALYTICS = {
+        "enabled": True,
+        "log_level": "INFO",
+        "metrics_collection": True,
+        "performance_monitoring": True,
+        "real_time_dashboard": True,
+        "data_retention_days": 30
+    }
+    
+    # =============================================================================
+    # 🔒 SECURITY AND COMPLIANCE
+    # =============================================================================
+    
+    SECURITY = {
+        "rate_limiting": True,
+        "max_requests_per_minute": 1000,
+        "user_agent_rotation": True,
+        "proxy_rotation": True,
+        "request_validation": True,
+        "ethical_guidelines": True
+    }
+    
+    # =============================================================================
+    # 🌐 NETWORK AND PROXY SETTINGS
+    # =============================================================================
+    
+    NETWORK = {
+        "timeout": 30,
+        "max_retries": 3,
+        "connection_pool_size": 100,
+        "proxy_enabled": True,
+        "proxy_list": [],  # Will be populated from proxy service
+        "ssl_verification": True
+    }
+    
+    # =============================================================================
+    # 📝 LOGGING CONFIGURATION
+    # =============================================================================
+    
+    LOGGING = {
+        "level": "INFO",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "file": "trafficflou.log",
+        "max_file_size": "10MB",
+        "backup_count": 5
+    }
+
+# Global configuration instance
+config = TrafficFlouConfig()
+
+# =============================================================================
+# 🚀 CONFIGURATION VALIDATION AND INITIALIZATION
+# =============================================================================
+
+def validate_config() -> bool:
+    """Validate the configuration settings"""
+    try:
+        # Validate required settings
+        assert config.TRAFFIC_SETTINGS["base_rate_per_minute"] > 0
+        assert config.TRAFFIC_SETTINGS["exponential_factor"] > 1.0
+        assert len(config.GAMEDIN_PAGES) > 0
+        assert len(config.INSTAGRAM_ACCOUNTS) > 0
         
-    Returns:
-        TrafficFlouConfig: Validated configuration
+        # Validate page weights sum to 1.0
+        total_weight = sum(config.TRAFFIC_SETTINGS["page_visit_weight"].values())
+        assert abs(total_weight - 1.0) < 0.01, f"Page weights must sum to 1.0, got {total_weight}"
         
-    Raises:
-        ValueError: If configuration is invalid
-    """
-    if config_source == "env":
-        config = load_config_from_env()
+        return True
+    except Exception as e:
+        print(f"❌ Configuration validation failed: {e}")
+        return False
+
+def get_config() -> TrafficFlouConfig:
+    """Get the global configuration instance"""
+    return config
+
+# Initialize configuration validation
+if __name__ == "__main__":
+    if validate_config():
+        print("✅ TrafficFlou configuration validated successfully")
+        print(f"🎯 GameDin.xyz pages configured: {len(config.GAMEDIN_PAGES)}")
+        print(f"📱 Instagram accounts configured: {len(config.INSTAGRAM_ACCOUNTS)}")
+        print(f"🚀 Base traffic rate: {config.TRAFFIC_SETTINGS['base_rate_per_minute']} req/min")
+        print(f"📈 Exponential factor: {config.TRAFFIC_SETTINGS['exponential_factor']}")
     else:
-        config = load_config_from_file(config_source)
-    
-    # Validate configuration
-    errors = config.validate_configuration()
-    if errors:
-        raise ValueError(f"Configuration validation failed: {'; '.join(errors)}")
-    
-    return config 
+        print("❌ Configuration validation failed") 

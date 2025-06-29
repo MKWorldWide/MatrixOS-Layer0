@@ -1,0 +1,98 @@
+# Core Dependencies (Essential)
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# AI Model Integrations (Core)
+openai==1.3.7
+anthropic==0.7.7
+langchain==0.0.350
+langchain-openai==0.0.2
+langchain-anthropic==0.0.1
+
+# HTTP and Networking (Essential)
+aiohttp==3.9.1
+httpx==0.25.2
+websockets==12.0
+requests==2.31.0
+urllib3==2.1.0
+
+# Traffic Generation and Simulation (Core)
+selenium==4.15.2
+playwright==1.40.0
+fake-useragent==1.4.0
+faker==20.1.0
+
+# Configuration and Environment (Essential)
+python-dotenv==1.0.0
+pyyaml==6.0.1
+toml==0.10.2
+
+# Security and Privacy (Essential)
+cryptography==41.0.8
+bcrypt==4.1.2
+python-jose[cryptography]==3.3.0
+
+# Proxy and Network Management (Core)
+aiohttp-socks==0.8.4
+requests[socks]==2.31.0
+geoip2==4.8.0
+
+# Async and Concurrency (Essential)
+asyncio-throttle==1.0.2
+
+# Testing (Development)
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+
+# Development Tools (Development)
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+mypy==1.7.1
+pre-commit==3.6.0
+
+# Logging and Monitoring (Essential)
+structlog==23.2.0
+sentry-sdk[fastapi]==1.38.0
+
+# Web Interface (Core)
+jinja2==3.1.2
+python-multipart==0.0.6
+
+# Data Processing (Essential)
+pandas==2.1.4
+numpy==1.25.2
+
+# Performance and Optimization (Optional - can be added as needed)
+# redis==5.0.1  # For caching
+# prometheus-client==0.19.0  # For metrics
+# elasticsearch==8.11.0  # For monitoring
+# influxdb-client==1.38.0  # For time-series data
+
+# Database (Optional - can be added as needed)
+# sqlalchemy==2.0.23  # For database operations
+# alembic==1.12.1  # For database migrations
+# psycopg2-binary==2.9.9  # For PostgreSQL
+
+# Machine Learning (Optional - can be added as needed)
+# scikit-learn==1.3.2  # For ML features
+# tensorflow==2.15.0  # For deep learning
+# torch==2.1.1  # For PyTorch
+
+# Visualization (Optional - can be added as needed)
+# matplotlib==3.8.2  # For plotting
+# seaborn==0.13.0  # For statistical visualization
+# plotly==5.17.0  # For interactive plots
+
+# Performance Libraries (Optional - can be added as needed)
+# orjson==3.9.10  # For fast JSON
+# ujson==5.8.0  # For fast JSON
+# msgpack==1.0.7  # For binary serialization
+
+# Additional Async Libraries (Optional - can be added as needed)
+# aiofiles==23.2.1  # For async file operations
+# asyncio-mqtt==0.16.1  # For MQTT messaging 

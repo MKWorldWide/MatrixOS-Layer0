@@ -357,6 +357,76 @@ FROM python:3.9-slim as runtime
 - **Threat Detection**: AI-powered threat detection
 - **Compliance**: Advanced compliance and audit features
 
+# TrafficFlou AWS Architecture (Quantum-Detailed)
+
+## AWS Amplify Apps (2025 Cleanup)
+
+### Active Web Applications
+- **Lilybear** (`d1g4c8ypk272om`)
+  - Repository: `https://github.com/M-K-World-Wide/Lilybear`
+  - Created: 2025-06-28
+  - Status: Active, connected to GitHub
+
+- **GameDin** (`d2cw7a7mglu6d6`)
+  - Repository: `https://github.com/M-K-World-Wide/GameDin`
+  - Created: 2025-06-05
+  - Status: Active, connected to GitHub
+
+- **NovaSanctum** (`d6i9np1z3yfe4`)
+  - Repository: `https://github.com/m-k-world-wide/novasanctum`
+  - Created: 2025-06-05
+  - Status: Active, connected to GitHub
+
+- **TrafficFlou** (`dwtq2xpv6r5lo`)
+  - Repository: `https://github.com/M-K-World-Wide/TrafficFlou.git`
+  - Created: 2025-06-29 (during cleanup)
+  - Status: Created, needs GitHub connection
+  - Purpose: Host Primal Genesis Web Interface
+
+### Cleanup Summary
+- **Removed:** MKWW, Empath (old/inactive projects)
+- **Kept:** All active M-K-World-Wide projects
+- **Added:** TrafficFlou for web interface hosting
+
+## Security Groups (2025 Refactor)
+
+### trafficflou-secure (sg-0c4dc86b8c4e9b2ee)
+- **Purpose:** Dedicated to TrafficFlou EC2 instances
+- **Inbound Rules:**
+  - SSH (22) from 107.199.169.79/32 (your IP)
+  - HTTP (80) from 0.0.0.0/0
+  - HTTPS (443) from 0.0.0.0/0
+- **Outbound Rules:**
+  - All traffic allowed
+- **Changelog:** Created during 2025 security refactor, replacing legacy groups
+
+### serafina-secure (sg-06944c8327d402458)
+- **Purpose:** Dedicated to Serafina Discord Bot EC2 instances
+- **Inbound Rules:**
+  - SSH (22) from 107.199.169.79/32 (your IP)
+  - HTTP (80) from 0.0.0.0/0
+  - HTTPS (443) from 0.0.0.0/0
+- **Outbound Rules:**
+  - All traffic allowed
+- **Changelog:** Created during 2025 security refactor, replacing legacy groups
+
+## Security Posture
+- Only the latest, most secure groups are in use
+- All legacy groups and dependencies have been removed
+- All scripts and automation reference these new groups exclusively
+
+## Cross-References
+- See `deploy_aws_trafficflou.sh` for group usage in automation
+- See `aws_cleanup.sh` for legacy resource removal
+
+## Performance & Security
+- Minimal, efficient rules for maximum security and compatibility
+- SSH access is tightly restricted to your IP
+- HTTP/HTTPS open for web access
+
+## Change History
+- 2025-06-29: Security group refactor, legacy cleanup, and documentation quantum update
+
 ---
 
 This architecture provides a solid foundation for the TrafficFlou system, ensuring scalability, reliability, and maintainability while supporting advanced AI-powered traffic generation capabilities. 

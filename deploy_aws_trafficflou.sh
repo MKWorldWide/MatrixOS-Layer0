@@ -20,11 +20,12 @@ NC='\033[0m' # No Color
 
 # Configuration
 PROJECT_NAME="TrafficFlou"
-GITHUB_REPO="https://github.com/sovereignsunny/TrafficFlou.git"
+GITHUB_REPO="https://github.com/M-K-World-Wide/TrafficFlou.git"
 EC2_INSTANCE_TYPE="t3.medium"
 EC2_AMI="ami-0c02fb55956c7d316"  # Amazon Linux 2 AMI
 KEY_NAME="trafficflou-key"
-SECURITY_GROUP_NAME="trafficflou-sg"
+# Quantum-detailed: Use only the new, secure security group for TrafficFlou
+SECURITY_GROUP_ID="sg-0c4dc86b8c4e9b2ee"  # trafficflou-secure
 REGION="us-east-1"
 
 # Function to print colored output
@@ -134,7 +135,7 @@ launch_ec2_instance() {
         --count 1 \
         --instance-type "$EC2_INSTANCE_TYPE" \
         --key-name "$KEY_NAME" \
-        --security-group-ids "$SG_ID" \
+        --security-group-ids "$SECURITY_GROUP_ID" \
         --region "$REGION" \
         --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$PROJECT_NAME}]" \
         --query 'Instances[0].InstanceId' --output text)
@@ -200,7 +201,7 @@ cd /home/ec2-user/TrafficFlou
 
 # Clone repository
 echo "📥 Cloning TrafficFlou repository..."
-git clone https://github.com/sovereignsunny/TrafficFlou.git .
+git clone https://github.com/M-K-World-Wide/TrafficFlou.git .
 
 # Create virtual environment
 echo "🔧 Setting up Python virtual environment..."

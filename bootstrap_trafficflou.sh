@@ -25,7 +25,7 @@ cd /home/ec2-user/TrafficFlou
 
 # Clone repository
 echo "📥 Cloning TrafficFlou repository..."
-git clone https://github.com/sovereignsunny/TrafficFlou.git .
+git clone https://github.com/M-K-World-Wide/TrafficFlou.git .
 
 # Create virtual environment
 echo "🔧 Setting up Python virtual environment..."

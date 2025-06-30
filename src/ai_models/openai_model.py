@@ -14,8 +14,8 @@ from typing import Dict, List, Any, Optional
 import time
 
 import openai
-from openai import AsyncOpenAI
 import structlog
+from pydantic import Field
 
 from .base import BaseAIModel, AIModelConfig, ModelType, BehaviorPattern, BehaviorType
 from ..core.exceptions import AIModelError
@@ -47,7 +47,7 @@ class OpenAIModel(BaseAIModel):
     behavior pattern generation capabilities.
     
     Attributes:
-        client (AsyncOpenAI): Async OpenAI client
+        client: OpenAI client
         model_name (str): Name of the OpenAI model
         config (OpenAIConfig): OpenAI-specific configuration
     """
@@ -69,12 +69,12 @@ class OpenAIModel(BaseAIModel):
         
         super().__init__(model_name, config)
         
-        # Initialize OpenAI client
-        self.client = AsyncOpenAI(
-            api_key=api_key,
-            organization=config.organization,
-            base_url=config.api_base,
-        )
+        # Initialize OpenAI client (compatible with openai==0.28.1)
+        openai.api_key = api_key
+        if config.organization:
+            openai.organization = config.organization
+        if config.api_base:
+            openai.api_base = config.api_base
         
         self.logger.info("OpenAI model initialized", 
                         model_name=model_name,
@@ -115,15 +115,14 @@ class OpenAIModel(BaseAIModel):
                     "messages": messages,
                     "max_tokens": self.config.max_tokens,
                     "temperature": self.config.temperature,
-                    "response_format": {"type": self.config.response_format},
                     "timeout": self.config.timeout,
                 }
                 
                 # Add any additional parameters
                 request_params.update(kwargs)
                 
-                # Make the request
-                response = await self.client.chat.completions.create(**request_params)
+                # Make the request using the compatible API
+                response = await openai.ChatCompletion.acreate(**request_params)
                 
                 # Extract the response content
                 if response.choices and len(response.choices) > 0:
@@ -134,7 +133,7 @@ class OpenAIModel(BaseAIModel):
                         parsed_response = json.loads(content)
                         return {
                             "choices": [{"message": {"content": parsed_response}}],
-                            "usage": response.usage.dict() if response.usage else {},
+                            "usage": response.usage,
                             "model": response.model,
                             "id": response.id
                         }
@@ -453,6 +452,4 @@ Focus on:
     
     async def close(self):
         """Clean up OpenAI client resources."""
-        await super().close()
-        if hasattr(self, 'client'):
-            await self.client.close() 
+        await super().close() 

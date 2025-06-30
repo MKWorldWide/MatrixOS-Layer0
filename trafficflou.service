@@ -1,0 +1,24 @@
+[Unit]
+Description=TrafficFlou Primal Genesis Engine Web Interface
+After=network.target
+
+[Service]
+Type=exec
+User=ec2-user
+Group=ec2-user
+WorkingDirectory=/home/ec2-user/TrafficFlou
+Environment=PATH=/home/ec2-user/TrafficFlou/venv/bin
+ExecStart=/home/ec2-user/TrafficFlou/venv/bin/python primal_genesis_web_interface.py
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=trafficflou
+
+# Security settings (adjusted for compatibility)
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target 

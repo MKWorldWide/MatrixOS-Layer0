@@ -25,6 +25,8 @@ class ModelType(Enum):
     """Enumeration of supported AI model types."""
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
+    ATHENA = "athena"
+    PRIMAL_GENESIS = "primal_genesis"
     CUSTOM = "custom"
 
 

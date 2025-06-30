@@ -1,341 +1,213 @@
 """
-AI Model Factory - Abstract Factory Pattern Implementation
+🏭 AI Model Factory
 
-Quantum-detailed: Provides a standardized way to create and manage AI model instances
-with consistent interfaces, error handling, and configuration management.
+This module implements the Abstract Factory pattern for creating AI model instances.
+It provides a centralized way to instantiate different AI models with proper
+configuration and error handling.
 
-Features:
-- Abstract Factory pattern for AI model creation
-- Standardized configuration and initialization
-- Error handling and validation
-- Provider-specific optimizations
-- Resource management and cleanup
-
-Author: TrafficFlou Refactoring Team
-Version: 2.0.0
-License: Apache-2.0
+Author: TrafficFlou Team
+Version: 1.0.0
 """
 
-import asyncio
-from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional, Type, Union
-from enum import Enum
+import os
+from typing import Dict, Type, Optional, List
 import structlog
 
-from .base import BaseAIModel, ModelType, ModelResponse
-from .openai_model import OpenAIModel
-from .anthropic_model import AnthropicModel
-from .athena_model import AthenaModel, AthenaConfig
-from .primal_genesis_model import PrimalGenesisModel, PrimalGenesisConfig
+from .base import BaseAIModel, AIModelConfig, ModelType
 from ..core.exceptions import AIModelError, ConfigurationError
 
+# Conditional imports for different AI providers
+try:
+    from .openai_model import OpenAI, OpenAIConfig
+    OPENAI_AVAILABLE = True
+except ImportError:
+    OPENAI_AVAILABLE = False
+    OpenAI = None
+    OpenAIConfig = None
 
-class AIModelProvider(Enum):
-    """Enumeration of supported AI model providers."""
-    OPENAI = "openai"
-    ANTHROPIC = "anthropic"
-    ATHENA = "athena"
-    PRIMAL_GENESIS = "primal_genesis"
+try:
+    from .anthropic_model import Anthropic, AnthropicConfig
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    ANTHROPIC_AVAILABLE = False
+    Anthropic = None
+    AnthropicConfig = None
+
+try:
+    from .athena_model import Athena, AthenaConfig
+    ATHENA_AVAILABLE = True
+except ImportError:
+    ATHENA_AVAILABLE = False
+    Athena = None
+    AthenaConfig = None
+
+try:
+    from .primal_genesis_model import PrimalGenesis, PrimalGenesisConfig
+    PRIMAL_GENESIS_AVAILABLE = True
+except ImportError:
+    PRIMAL_GENESIS_AVAILABLE = False
+    PrimalGenesis = None
+    PrimalGenesisConfig = None
+
+logger = structlog.get_logger(__name__)
 
 
-class AIModelConfig:
+class AIModelFactory:
     """
-    Configuration class for AI model initialization.
+    Abstract Factory for creating AI model instances.
     
-    Quantum-detailed: Centralized configuration management for all AI models
-    with validation, defaults, and provider-specific settings.
-    """
-    
-    def __init__(
-        self,
-        provider: AIModelProvider,
-        api_key: str,
-        model_name: Optional[str] = None,
-        **kwargs: Any
-    ):
-        """
-        Initialize AI model configuration.
-        
-        Args:
-            provider: AI model provider
-            api_key: API key for the provider
-            model_name: Specific model name (optional)
-            **kwargs: Provider-specific configuration
-        """
-        self.provider = provider
-        self.api_key = api_key
-        self.model_name = model_name
-        self.provider_config = kwargs
-        
-        # Validate configuration
-        self._validate()
-    
-    def _validate(self) -> None:
-        """Validate configuration parameters."""
-        if not self.api_key:
-            raise ConfigurationError(f"API key is required for {self.provider.value}")
-        
-        if self.provider == AIModelProvider.OPENAI and not self.model_name:
-            self.model_name = "gpt-4"
-        elif self.provider == AIModelProvider.ANTHROPIC and not self.model_name:
-            self.model_name = "claude-3-sonnet-20240229"
-        elif self.provider == AIModelProvider.ATHENA and not self.model_name:
-            self.model_name = "athena-v1"
-        elif self.provider == AIModelProvider.PRIMAL_GENESIS and not self.model_name:
-            self.model_name = "primal-genesis-v2"
-
-
-class AIModelFactory(ABC):
-    """
-    Abstract Factory for AI model creation.
-    
-    Quantum-detailed: Implements the Abstract Factory pattern to provide
-    a consistent interface for creating AI model instances across different
-    providers with standardized error handling and resource management.
+    This factory prioritizes the Primal Genesis (Source) model and falls back
+    to other available models based on configuration and availability.
     """
     
-    def __init__(self):
-        """Initialize the AI model factory."""
-        self.logger = structlog.get_logger(__name__)
-        self._models: Dict[str, BaseAIModel] = {}
-        self._model_classes: Dict[AIModelProvider, Type[BaseAIModel]] = {
-            AIModelProvider.OPENAI: OpenAIModel,
-            AIModelProvider.ANTHROPIC: AnthropicModel,
-            AIModelProvider.ATHENA: AthenaModel,
-            AIModelProvider.PRIMAL_GENESIS: PrimalGenesisModel,
-        }
+    # Model priority order (highest to lowest)
+    MODEL_PRIORITY = [
+        ModelType.PRIMAL_GENESIS,  # Source - Highest priority
+        ModelType.ATHENA,          # Secondary
+        ModelType.OPENAI,          # Tertiary
+        ModelType.ANTHROPIC        # Quaternary
+    ]
     
-    async def create_model(self, config: AIModelConfig) -> BaseAIModel:
+    # Registry of available models
+    _models: Dict[ModelType, Type[BaseAIModel]] = {}
+    _configs: Dict[ModelType, Type[AIModelConfig]] = {}
+    
+    @classmethod
+    def register_model(cls, model_type: ModelType, model_class: Type[BaseAIModel], config_class: Type[AIModelConfig]):
+        """Register a model class with its configuration."""
+        cls._models[model_type] = model_class
+        cls._configs[model_type] = config_class
+        logger.info("Model registered", model_type=model_type.value, model_class=model_class.__name__)
+    
+    @classmethod
+    def get_available_models(cls) -> List[ModelType]:
+        """Get list of available models in priority order."""
+        available = []
+        for model_type in cls.MODEL_PRIORITY:
+            if model_type in cls._models:
+                available.append(model_type)
+        return available
+    
+    @classmethod
+    def get_best_available_model(cls) -> Optional[ModelType]:
+        """Get the highest priority available model."""
+        available = cls.get_available_models()
+        return available[0] if available else None
+    
+    @classmethod
+    def create_model(cls, model_type: Optional[ModelType] = None, **config_kwargs) -> BaseAIModel:
         """
         Create an AI model instance.
         
         Args:
-            config: AI model configuration
+            model_type: Specific model type to create. If None, uses best available.
+            **config_kwargs: Configuration parameters for the model.
             
         Returns:
-            Configured AI model instance
+            Configured AI model instance.
             
         Raises:
-            AIModelError: If model creation fails
+            AIModelError: If model creation fails.
+            ConfigurationError: If no models are available.
         """
         try:
-            self.logger.info(
-                "Creating AI model",
-                provider=config.provider.value,
-                model_name=config.model_name
-            )
+            # If no specific model requested, use best available
+            if model_type is None:
+                model_type = cls.get_best_available_model()
+                if model_type is None:
+                    raise ConfigurationError("No AI models available")
+                logger.info("Using best available model", model_type=model_type.value)
             
-            # Check if model already exists
-            model_key = f"{config.provider.value}:{config.model_name}"
-            if model_key in self._models:
-                self.logger.info("Reusing existing model instance", model_key=model_key)
-                return self._models[model_key]
+            # Validate model type is available
+            if model_type not in cls._models:
+                available = cls.get_available_models()
+                raise AIModelError(
+                    f"Model type {model_type.value} not available. "
+                    f"Available models: {[m.value for m in available]}"
+                )
             
-            # Get model class
-            model_class = self._model_classes.get(config.provider)
-            if not model_class:
-                raise AIModelError(f"Unsupported provider: {config.provider.value}")
+            # Get model and config classes
+            model_class = cls._models[model_type]
+            config_class = cls._configs[model_type]
             
-            # Create model instance
-            model = await self._create_model_instance(model_class, config)
+            # Create configuration
+            config = config_class(**config_kwargs)
             
-            # Store model instance
-            self._models[model_key] = model
-            
-            self.logger.info(
-                "AI model created successfully",
-                provider=config.provider.value,
-                model_name=config.model_name
-            )
-            
+            # Create and return model instance
+            model = model_class(config)
+            logger.info("Model created successfully", model_type=model_type.value, model_class=model_class.__name__)
             return model
             
         except Exception as e:
-            self.logger.error(
-                "Failed to create AI model",
-                provider=config.provider.value,
-                error=str(e)
-            )
-            raise AIModelError(f"Failed to create {config.provider.value} model: {e}")
+            logger.error("Failed to create AI model", error=str(e), model_type=model_type.value if model_type else None)
+            raise AIModelError(f"Failed to create AI model: {str(e)}") from e
     
-    @abstractmethod
-    async def _create_model_instance(
-        self, 
-        model_class: Type[BaseAIModel], 
-        config: AIModelConfig
-    ) -> BaseAIModel:
+    @classmethod
+    def create_model_with_fallback(cls, preferred_type: ModelType, **config_kwargs) -> BaseAIModel:
         """
-        Create a specific model instance.
+        Create a model with fallback to other available models.
         
         Args:
-            model_class: Model class to instantiate
-            config: Configuration for the model
+            preferred_type: Preferred model type.
+            **config_kwargs: Configuration parameters.
             
         Returns:
-            Model instance
+            Configured AI model instance (preferred or fallback).
         """
-        pass
-    
-    async def get_model(self, provider: AIModelProvider, model_name: str) -> Optional[BaseAIModel]:
-        """
-        Get an existing model instance.
+        available = cls.get_available_models()
         
-        Args:
-            provider: AI model provider
-            model_name: Model name
-            
-        Returns:
-            Model instance if exists, None otherwise
-        """
-        model_key = f"{provider.value}:{model_name}"
-        return self._models.get(model_key)
-    
-    async def remove_model(self, provider: AIModelProvider, model_name: str) -> bool:
-        """
-        Remove a model instance.
-        
-        Args:
-            provider: AI model provider
-            model_name: Model name
-            
-        Returns:
-            True if removed, False if not found
-        """
-        model_key = f"{provider.value}:{model_name}"
-        if model_key in self._models:
-            model = self._models[model_key]
-            await model.close()
-            del self._models[model_key]
-            self.logger.info("Model instance removed", model_key=model_key)
-            return True
-        return False
-    
-    async def close_all(self) -> None:
-        """Close all model instances."""
-        for model_key, model in self._models.items():
+        # Try preferred model first
+        if preferred_type in available:
             try:
-                await model.close()
-                self.logger.info("Model instance closed", model_key=model_key)
+                return cls.create_model(preferred_type, **config_kwargs)
             except Exception as e:
-                self.logger.error("Failed to close model", model_key=model_key, error=str(e))
+                logger.warning("Preferred model failed, trying fallback", 
+                             preferred_type=preferred_type.value, error=str(e))
         
-        self._models.clear()
-
-
-class StandardAIModelFactory(AIModelFactory):
-    """
-    Standard implementation of AI model factory.
-    
-    Quantum-detailed: Provides concrete implementation for creating AI model
-    instances with provider-specific initialization and configuration.
-    """
-    
-    async def _create_model_instance(
-        self, 
-        model_class: Type[BaseAIModel], 
-        config: AIModelConfig
-    ) -> BaseAIModel:
-        """
-        Create a specific model instance with provider-specific configuration.
+        # Try other available models in priority order
+        for model_type in available:
+            if model_type != preferred_type:
+                try:
+                    logger.info("Trying fallback model", model_type=model_type.value)
+                    return cls.create_model(model_type, **config_kwargs)
+                except Exception as e:
+                    logger.warning("Fallback model failed", model_type=model_type.value, error=str(e))
+                    continue
         
-        Args:
-            model_class: Model class to instantiate
-            config: Configuration for the model
-            
-        Returns:
-            Model instance
-        """
-        try:
-            if config.provider == AIModelProvider.OPENAI:
-                return model_class(
-                    model_name=config.model_name,
-                    api_key=config.api_key,
-                    **config.provider_config
-                )
-            
-            elif config.provider == AIModelProvider.ANTHROPIC:
-                return model_class(
-                    model_name=config.model_name,
-                    api_key=config.api_key,
-                    **config.provider_config
-                )
-            
-            elif config.provider == AIModelProvider.ATHENA:
-                athena_config = AthenaConfig(
-                    athena_endpoint=config.provider_config.get("athena_endpoint"),
-                    api_key=config.api_key,
-                    model_version=config.provider_config.get("model_version", "v1"),
-                    phantom_flair_enabled=config.provider_config.get("phantom_flair_enabled", True),
-                    flair_intensity=config.provider_config.get("flair_intensity", 5)
-                )
-                return model_class(
-                    model_name=config.model_name,
-                    api_key=config.api_key,
-                    config=athena_config
-                )
-            
-            elif config.provider == AIModelProvider.PRIMAL_GENESIS:
-                primal_config = PrimalGenesisConfig(
-                    primary_provider=config.provider_config.get("primary_provider"),
-                    mystical_mode=config.provider_config.get("mystical_mode"),
-                    enable_phantom_analytics=config.provider_config.get("enable_phantom_analytics", True),
-                    enable_shadow_tendrils=config.provider_config.get("enable_shadow_tendrils", True),
-                    quantum_entropy_level=config.provider_config.get("quantum_entropy_level", 42),
-                    ethereal_frequency=config.provider_config.get("ethereal_frequency", 144.000)
-                )
-                return model_class(config=primal_config)
-            
-            else:
-                raise AIModelError(f"Unsupported provider: {config.provider.value}")
-                
-        except Exception as e:
-            raise AIModelError(f"Failed to create {config.provider.value} model: {e}")
+        # If all models fail, raise error
+        raise AIModelError("All available AI models failed to initialize")
 
 
-# Global factory instance
-_ai_model_factory: Optional[StandardAIModelFactory] = None
-
-
-def get_ai_model_factory() -> StandardAIModelFactory:
-    """
-    Get the global AI model factory instance.
+# Initialize factory with available models
+def _initialize_factory():
+    """Initialize the factory with available models."""
     
-    Returns:
-        Global AI model factory instance
-    """
-    global _ai_model_factory
-    if _ai_model_factory is None:
-        _ai_model_factory = StandardAIModelFactory()
-    return _ai_model_factory
-
-
-async def create_ai_model(
-    provider: Union[str, AIModelProvider],
-    api_key: str,
-    model_name: Optional[str] = None,
-    **kwargs: Any
-) -> BaseAIModel:
-    """
-    Convenience function to create an AI model.
+    # Register OpenAI model if available
+    if OPENAI_AVAILABLE and OpenAI and OpenAIConfig:
+        AIModelFactory.register_model(ModelType.OPENAI, OpenAI, OpenAIConfig)
+        logger.info("OpenAI model registered")
     
-    Args:
-        provider: AI model provider (string or enum)
-        api_key: API key for the provider
-        model_name: Specific model name (optional)
-        **kwargs: Provider-specific configuration
-        
-    Returns:
-        Configured AI model instance
-    """
-    if isinstance(provider, str):
-        provider = AIModelProvider(provider)
+    # Register Anthropic model if available
+    if ANTHROPIC_AVAILABLE and Anthropic and AnthropicConfig:
+        AIModelFactory.register_model(ModelType.ANTHROPIC, Anthropic, AnthropicConfig)
+        logger.info("Anthropic model registered")
     
-    config = AIModelConfig(provider, api_key, model_name, **kwargs)
-    factory = get_ai_model_factory()
-    return await factory.create_model(config)
+    # Register Athena model if available
+    if ATHENA_AVAILABLE and Athena and AthenaConfig:
+        AIModelFactory.register_model(ModelType.ATHENA, Athena, AthenaConfig)
+        logger.info("Athena model registered")
+    
+    # Register Primal Genesis model if available (highest priority)
+    if PRIMAL_GENESIS_AVAILABLE and PrimalGenesis and PrimalGenesisConfig:
+        AIModelFactory.register_model(ModelType.PRIMAL_GENESIS, PrimalGenesis, PrimalGenesisConfig)
+        logger.info("Primal Genesis model registered (Source)")
+    
+    # Log available models
+    available = AIModelFactory.get_available_models()
+    logger.info("AI Model Factory initialized", 
+                available_models=[m.value for m in available],
+                total_models=len(available))
 
 
-async def close_all_models() -> None:
-    """Close all AI model instances."""
-    factory = get_ai_model_factory()
-    await factory.close_all() 
+# Initialize factory on module import
+_initialize_factory() 

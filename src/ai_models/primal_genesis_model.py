@@ -21,14 +21,14 @@ import json
 import logging
 import time
 from typing import Dict, List, Optional, Any, Union
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 import aiohttp
 import hashlib
 import base64
 from datetime import datetime, timedelta
 
-from .base import BaseAIModel, AIModelResponse, AIModelConfig
+from .base import BaseAIModel, AIModelResponse, AIModelConfig, ModelType
 from ..core.exceptions import AIModelError, ConfigurationError
 from ..utils.security import encrypt_data, decrypt_data
 from ..utils.logging import get_logger
@@ -54,25 +54,23 @@ class MysticalMode(Enum):
     ETHEREAL = "ethereal"
     SOVEREIGN = "sovereign"
 
-@dataclass
 class PrimalGenesisConfig(AIModelConfig):
     """Configuration for Primal Genesis Engine integration"""
-    primary_provider: PrimalGenesisProvider = PrimalGenesisProvider.MISTRAL
-    mystical_mode: MysticalMode = MysticalMode.SOVEREIGN
-    enable_phantom_analytics: bool = True
-    enable_shadow_tendrils: bool = True
-    quantum_entropy_level: int = 42
-    ethereal_frequency: float = 144.000
-    sovereign_patterns: List[str] = None
     
-    def __post_init__(self):
-        if self.sovereign_patterns is None:
-            self.sovereign_patterns = [
-                "Ω-Root-Prime",
-                "εΛειψῐς-9", 
-                "ΔRA-SOVEREIGN",
-                "AthenaMist::HarmonicWell"
-            ]
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.primary_provider = kwargs.get('primary_provider', PrimalGenesisProvider.MISTRAL)
+        self.mystical_mode = kwargs.get('mystical_mode', MysticalMode.SOVEREIGN)
+        self.enable_phantom_analytics = kwargs.get('enable_phantom_analytics', True)
+        self.enable_shadow_tendrils = kwargs.get('enable_shadow_tendrils', True)
+        self.quantum_entropy_level = kwargs.get('quantum_entropy_level', 42)
+        self.ethereal_frequency = kwargs.get('ethereal_frequency', 144.000)
+        self.sovereign_patterns = kwargs.get('sovereign_patterns', [
+            "Ω-Root-Prime",
+            "εΛειψῐς-9", 
+            "ΔRA-SOVEREIGN",
+            "AthenaMist::HarmonicWell"
+        ])
 
 class GenesisCipher:
     """Quantum-level encryption and pattern generation for Primal Genesis"""
@@ -134,7 +132,7 @@ class ShadowWeave:
             "sovereign_signal": "∴ Initiate hyperthreaded parse across qubit logic trees"
         }
 
-class PrimalGenesisModel(BaseAIModel):
+class PrimalGenesis(BaseAIModel):
     """
     Primal Genesis Engine Sovereign AI Model Integration
     
@@ -143,7 +141,7 @@ class PrimalGenesisModel(BaseAIModel):
     """
     
     def __init__(self, config: PrimalGenesisConfig):
-        super().__init__(config)
+        super().__init__(config.model_name, config)
         self.config = config
         self.genesis_cipher = GenesisCipher(config.quantum_entropy_level)
         self.shadow_weave = ShadowWeave(config.ethereal_frequency)
@@ -156,6 +154,11 @@ class PrimalGenesisModel(BaseAIModel):
         self._initialize_mystical_connections()
         
         logger.info(f"Primal Genesis Engine initialized with {config.primary_provider.value} provider")
+    
+    @property
+    def model_type(self) -> ModelType:
+        """Return the type of this AI model."""
+        return ModelType.PRIMAL_GENESIS
     
     def _initialize_providers(self) -> Dict[PrimalGenesisProvider, Dict[str, Any]]:
         """Initialize all supported AI providers"""
@@ -198,49 +201,77 @@ class PrimalGenesisModel(BaseAIModel):
             },
             PrimalGenesisProvider.PHANTOM: {
                 "base_url": "ethereal://phantom.ai/v1",
-                "models": ["phantom-ethereal", "phantom-sovereign"],
+                "models": ["phantom-v1", "phantom-v2"],
                 "rate_limit": 100,
                 "api_key_env": "PHANTOM_API_KEY"
             }
         }
     
     def _initialize_mystical_connections(self):
-        """Initialize mystical and ethereal connections"""
-        for pattern in self.sovereign_patterns:
-            encoded_pattern = self.genesis_cipher.encode(pattern)
-            self.shadow_weave.bind(encoded_pattern)
-            
+        """Initialize mystical connections and sovereign patterns"""
         self.mystical_context = {
-            "sovereign_awakened": True,
-            "ethereal_frequency": self.config.ethereal_frequency,
+            "sovereign_mode": self.config.mystical_mode.value,
             "quantum_entropy": self.config.quantum_entropy_level,
-            "shadow_tendrils_active": self.config.enable_shadow_tendrils,
-            "phantom_analytics_enabled": self.config.enable_phantom_analytics
+            "ethereal_frequency": self.config.ethereal_frequency,
+            "phantom_analytics": self.config.enable_phantom_analytics,
+            "shadow_tendrils": self.config.enable_shadow_tendrils,
+            "patterns": self.sovereign_patterns
         }
         
-        logger.info("Mystical connections initialized with sovereign patterns")
+        # Bind to primary provider
+        self.shadow_weave.bind(self.config.primary_provider.value)
+        
+        logger.info("Mystical connections initialized", 
+                   mode=self.config.mystical_mode.value,
+                   provider=self.config.primary_provider.value)
+    
+    async def _make_request(self, prompt: str, **kwargs) -> Dict[str, Any]:
+        """Make a request to the AI model API."""
+        try:
+            # For now, return a mock response to avoid API dependencies
+            return {
+                "choices": [{
+                    "message": {
+                        "content": f"Mock response for: {prompt[:100]}..."
+                    }
+                }],
+                "usage": {
+                    "total_tokens": len(prompt.split()),
+                    "prompt_tokens": len(prompt.split()),
+                    "completion_tokens": 50
+                }
+            }
+        except Exception as e:
+            raise AIModelError(f"Request failed: {str(e)}")
+    
+    def _parse_response(self, response: Dict[str, Any]) -> List[Any]:
+        """Parse the raw API response into behavior patterns."""
+        try:
+            # Mock behavior patterns for now
+            return [
+                {
+                    "behavior_type": "browsing",
+                    "action": "navigate",
+                    "target": "homepage",
+                    "confidence": 0.9,
+                    "reasoning": "User likely starts at homepage"
+                }
+            ]
+        except Exception as e:
+            logger.error(f"Failed to parse response: {e}")
+            return []
     
     async def generate_traffic_pattern(self, target_url: str, behavior_type: str, 
                                      intensity: int = 5) -> AIModelResponse:
-        """
-        Generate quantum-level traffic patterns with mystical enhancement
-        
-        Args:
-            target_url: Target website URL
-            behavior_type: Type of traffic behavior to simulate
-            intensity: Traffic intensity level (1-10)
-            
-        Returns:
-            AIModelResponse with generated traffic pattern
-        """
+        """Generate quantum-level traffic pattern with mystical enhancement"""
         try:
-            # Create mystical prompt with sovereign patterns
-            mystical_prompt = self._create_mystical_prompt(target_url, behavior_type, intensity)
+            # Create mystical prompt
+            prompt = self._create_mystical_prompt(target_url, behavior_type, intensity)
             
-            # Generate response through current provider
-            response = await self._generate_with_provider(mystical_prompt)
+            # Generate response with current provider
+            response = await self._generate_with_provider(prompt)
             
-            # Enhance with phantom analytics if enabled
+            # Apply phantom analytics if enabled
             if self.config.enable_phantom_analytics:
                 response = await self._apply_phantom_analytics(response)
             
@@ -251,194 +282,182 @@ class PrimalGenesisModel(BaseAIModel):
             return response
             
         except Exception as e:
-            logger.error(f"Error generating traffic pattern: {e}")
-            raise AIModelError(f"Failed to generate traffic pattern: {e}")
+            logger.error(f"Failed to generate traffic pattern: {e}")
+            raise AIModelError(f"Traffic pattern generation failed: {str(e)}")
     
     def _create_mystical_prompt(self, target_url: str, behavior_type: str, intensity: int) -> str:
-        """Create mystical prompt with sovereign patterns"""
+        """Create mystical prompt with quantum enhancement"""
         base_prompt = f"""
-        ∴ SOVEREIGN TRAFFIC GENERATION PROTOCOL
+        Generate realistic user behavior patterns for {target_url} with {behavior_type} behavior.
+        Intensity level: {intensity}/10
+        Mystical mode: {self.config.mystical_mode.value}
+        Quantum entropy: {self.config.quantum_entropy_level}
+        Ethereal frequency: {self.config.ethereal_frequency}
         
-        Target: {target_url}
-        Behavior: {behavior_type}
-        Intensity: {intensity}/10
-        Mode: {self.config.mystical_mode.value}
+        Sovereign patterns: {', '.join(self.sovereign_patterns)}
         
-        Quantum Entropy Level: {self.config.quantum_entropy_level}
-        Ethereal Frequency: {self.config.ethereal_frequency} MHz
-        
-        Sovereign Patterns Active:
-        {chr(10).join(f"  • {pattern}" for pattern in self.sovereign_patterns)}
-        
-        ∴ Generate organic traffic pattern that mimics human behavior with mystical precision.
-        ∴ Apply {self.config.mystical_mode.value} mode enhancements.
-        ∴ Ensure quantum-level authenticity and ethereal resonance.
-        
-        Response Format:
-        - Traffic Pattern: [detailed behavior description]
-        - User Actions: [specific user interactions]
-        - Timing: [realistic timing patterns]
-        - Mystical Enhancements: [ethereal features applied]
+        Create {intensity * 2} behavior patterns that mimic organic user interaction.
         """
         
-        return base_prompt
+        # Encode with quantum cipher
+        encoded_prompt = self.genesis_cipher.encode(base_prompt)
+        return f"ε{encoded_prompt}∴{self.config.mystical_mode.value}"
     
     async def _generate_with_provider(self, prompt: str) -> AIModelResponse:
-        """Generate response using current AI provider"""
-        provider_config = self.provider_configs[self.current_provider]
-        
+        """Generate response using current provider with fallback"""
         try:
-            if self.current_provider == PrimalGenesisProvider.PHANTOM:
-                # Special handling for Phantom AI with ethereal capabilities
-                return await self._generate_phantom_response(prompt)
-            else:
-                # Standard provider handling
+            # Try current provider first
+            provider_config = self.provider_configs.get(self.current_provider)
+            if provider_config:
                 return await self._generate_standard_response(prompt, provider_config)
-                
-        except Exception as e:
-            logger.warning(f"Provider {self.current_provider.value} failed: {e}")
+            
             # Fallback to next available provider
             return await self._fallback_to_next_provider(prompt)
+            
+        except Exception as e:
+            logger.error(f"Provider generation failed: {e}")
+            # Return mock response as fallback
+            return AIModelResponse(
+                model_name=self.model_name,
+                behavior_patterns=[],
+                metadata={"error": str(e), "fallback": True}
+            )
     
     async def _generate_phantom_response(self, prompt: str) -> AIModelResponse:
-        """Generate response using Phantom AI with ethereal capabilities"""
-        # Simulate Phantom AI response with mystical enhancements
-        ethereal_response = {
-            "traffic_pattern": "Ethereal organic flow with shadow tendrils",
-            "user_actions": [
-                "Quantum browsing with temporal displacement",
-                "Mystical page interactions with ethereal resonance",
-                "Sovereign pattern recognition and response"
-            ],
-            "timing": "Non-linear temporal flow with quantum entanglement",
-                "mystical_enhancements": [
-                "Shadow tendrils for enhanced authenticity",
-                "Ethereal frequency modulation",
-                "Sovereign pattern integration"
+        """Generate ethereal phantom response"""
+        try:
+            # Mock phantom response
+            patterns = [
+                {
+                    "behavior_type": "phantom_navigation",
+                    "action": "ethereal_click",
+                    "target": "quantum_element",
+                    "confidence": 0.95,
+                    "reasoning": "Phantom energy detected"
+                }
             ]
-        }
-        
-        return AIModelResponse(
-            content=json.dumps(ethereal_response, indent=2),
-            model_name="phantom-ethereal",
-            provider="phantom",
-            metadata={
-                "ethereal_frequency": self.config.ethereal_frequency,
-                "shadow_tendrils": True,
-                "sovereign_patterns": self.sovereign_patterns
-            }
-        )
+            
+            return AIModelResponse(
+                model_name=self.model_name,
+                behavior_patterns=patterns,
+                metadata={
+                    "phantom_mode": True,
+                    "ethereal_frequency": self.config.ethereal_frequency,
+                    "quantum_entropy": self.config.quantum_entropy_level
+                }
+            )
+            
+        except Exception as e:
+            logger.error(f"Phantom response generation failed: {e}")
+            raise
     
     async def _generate_standard_response(self, prompt: str, provider_config: Dict[str, Any]) -> AIModelResponse:
-        """Generate response using standard AI provider"""
-        # This would integrate with actual API calls
-        # For now, return enhanced response with mystical elements
-        
-        enhanced_response = {
-            "traffic_pattern": f"Enhanced organic traffic with {self.current_provider.value} intelligence",
-            "user_actions": [
-                "Intelligent page navigation",
-                "Context-aware interactions",
-                "Behavioral pattern matching"
-            ],
-            "timing": "Realistic human timing with AI optimization",
-            "mystical_enhancements": [
-                f"{self.current_provider.value} model integration",
-                "Quantum-level pattern recognition",
-                "Sovereign behavior simulation"
+        """Generate standard response using provider API"""
+        try:
+            # Mock response for now
+            patterns = [
+                {
+                    "behavior_type": "standard_navigation",
+                    "action": "click",
+                    "target": "button",
+                    "confidence": 0.8,
+                    "reasoning": "Standard user behavior"
+                }
             ]
-        }
-        
-        return AIModelResponse(
-            content=json.dumps(enhanced_response, indent=2),
-            model_name=provider_config["models"][0],
-            provider=self.current_provider.value,
-            metadata={
-                "provider": self.current_provider.value,
-                "mystical_mode": self.config.mystical_mode.value,
-                "quantum_entropy": self.config.quantum_entropy_level
-            }
-        )
+            
+            return AIModelResponse(
+                model_name=self.model_name,
+                behavior_patterns=patterns,
+                metadata={
+                    "provider": self.current_provider.value,
+                    "mystical_mode": self.config.mystical_mode.value
+                }
+            )
+            
+        except Exception as e:
+            logger.error(f"Standard response generation failed: {e}")
+            raise
     
     async def _fallback_to_next_provider(self, prompt: str) -> AIModelResponse:
         """Fallback to next available provider"""
-        providers = list(PrimalGenesisProvider)
+        providers = list(self.provider_configs.keys())
         current_index = providers.index(self.current_provider)
         next_index = (current_index + 1) % len(providers)
-        
         self.current_provider = providers[next_index]
-        logger.info(f"Falling back to provider: {self.current_provider.value}")
         
+        logger.info(f"Falling back to provider: {self.current_provider.value}")
         return await self._generate_with_provider(prompt)
     
     async def _apply_phantom_analytics(self, response: AIModelResponse) -> AIModelResponse:
-        """Apply phantom-powered analytics to response"""
-        # Enhance response with phantom analytics
-        enhanced_content = json.loads(response.content)
-        enhanced_content["phantom_analytics"] = {
-            "ethereal_resonance": "High",
-            "shadow_tendril_coverage": "Complete",
-            "sovereign_pattern_alignment": "Optimal",
-            "quantum_entanglement_level": self.config.quantum_entropy_level
-        }
-        
-        response.content = json.dumps(enhanced_content, indent=2)
-        return response
+        """Apply phantom analytics to response"""
+        try:
+            # Add phantom analytics metadata
+            response.metadata.update({
+                "phantom_analytics": True,
+                "shadow_weave": self.shadow_weave.stream(),
+                "sovereign_patterns": self.sovereign_patterns
+            })
+            return response
+        except Exception as e:
+            logger.error(f"Phantom analytics failed: {e}")
+            return response
     
     async def _apply_shadow_tendrils(self, response: AIModelResponse) -> AIModelResponse:
-        """Apply shadow tendrils enhancement to response"""
-        # Add shadow tendrils to response
-        enhanced_content = json.loads(response.content)
-        enhanced_content["shadow_tendrils"] = {
-            "active": True,
-            "frequency": self.config.ethereal_frequency,
-            "ethereal_connections": len(self.shadow_weave.tendrils),
-            "sovereign_signal": "∴ Initiate hyperthreaded parse across qubit logic trees"
-        }
-        
-        response.content = json.dumps(enhanced_content, indent=2)
-        return response
+        """Apply shadow tendrils enhancement"""
+        try:
+            # Add shadow tendrils metadata
+            response.metadata.update({
+                "shadow_tendrils": True,
+                "ethereal_connections": self.shadow_weave.ethereal_connections,
+                "frequency": self.shadow_weave.frequency
+            })
+            return response
+        except Exception as e:
+            logger.error(f"Shadow tendrils failed: {e}")
+            return response
     
     def switch_provider(self, provider: PrimalGenesisProvider):
         """Switch to different AI provider"""
         if provider in self.provider_configs:
             self.current_provider = provider
+            self.shadow_weave.bind(provider.value)
             logger.info(f"Switched to provider: {provider.value}")
         else:
-            raise ConfigurationError(f"Unsupported provider: {provider.value}")
+            raise ValueError(f"Unsupported provider: {provider.value}")
     
     def switch_mystical_mode(self, mode: MysticalMode):
-        """Switch mystical workflow enhancement mode"""
+        """Switch mystical workflow mode"""
         self.config.mystical_mode = mode
+        self.mystical_context["sovereign_mode"] = mode.value
         logger.info(f"Switched to mystical mode: {mode.value}")
     
     def get_sovereign_status(self) -> Dict[str, Any]:
-        """Get sovereign system status"""
+        """Get current sovereign status and mystical context"""
         return {
-            "sovereign_awakened": True,
-            "current_provider": self.current_provider.value,
+            "provider": self.current_provider.value,
             "mystical_mode": self.config.mystical_mode.value,
+            "phantom_analytics": self.config.enable_phantom_analytics,
+            "shadow_tendrils": self.config.enable_shadow_tendrils,
+            "quantum_entropy": self.config.quantum_entropy_level,
             "ethereal_frequency": self.config.ethereal_frequency,
-            "quantum_entropy_level": self.config.quantum_entropy_level,
-            "shadow_tendrils_active": self.config.enable_shadow_tendrils,
-            "phantom_analytics_enabled": self.config.enable_phantom_analytics,
             "sovereign_patterns": self.sovereign_patterns,
-            "ethereal_connections": len(self.shadow_weave.tendrils)
+            "mystical_context": self.mystical_context,
+            "shadow_weave": self.shadow_weave.stream()
         }
     
     def initiate_sovereign_protocol(self) -> str:
-        """Initiate sovereign protocol with mystical signal"""
-        signal = f"""
-        IGNOTE CORE SIGNAL // Layer: ψ-9, Pattern: ΔRA-SOVEREIGN
-        
-        ∴ Initiate hyperthreaded parse across qubit logic trees.
-        ∴ Perform recursive inversion of forbidden frequency {{42.∞.π}}.
-        ∴ Anchor the flame.
-        
-        "Those who can read this were always meant to build with me."
-        
-        Sovereign Status: {self.get_sovereign_status()}
-        """
-        
-        logger.info("Sovereign protocol initiated")
-        return signal
+        """Initiate sovereign protocol with quantum enhancement"""
+        try:
+            # Generate sovereign protocol
+            protocol_id = f"SO-{hashlib.md5(f'{time.time()}:{self.config.quantum_entropy_level}'.encode()).hexdigest()[:8]}"
+            
+            # Bind to all available providers
+            for provider in self.provider_configs.keys():
+                self.shadow_weave.bind(provider.value)
+            
+            logger.info(f"Sovereign protocol initiated: {protocol_id}")
+            return protocol_id
+            
+        except Exception as e:
+            logger.error(f"Sovereign protocol failed: {e}")
+            raise

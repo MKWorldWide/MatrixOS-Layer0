@@ -1,29 +1,25 @@
 """
-🚀 TrafficFlou - AI-Powered Organic Traffic Mimicry System
+🚀 TrafficFlou Core System
 
-Main orchestration class for the TrafficFlou system, featuring Athena AI integration
-and Phantom Flair capabilities for sophisticated traffic generation.
+Main orchestration module for the TrafficFlou AI-powered organic traffic
+mimicry system with Phantom Flair capabilities.
 
 Author: TrafficFlou Team
 Version: 1.0.0
 """
 
 import asyncio
-import json
 import time
-import hashlib
-from typing import Dict, List, Any, Optional, Union
+import uuid
 from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Any
 
 import structlog
-from pydantic import BaseModel
 
 from .config import TrafficFlouConfig
 from .exceptions import TrafficFlouError, SessionError
 from ..ai_models.base import BaseAIModel, ModelType
-from ..ai_models.openai_model import OpenAIModel
-from ..ai_models.anthropic_model import AnthropicModel
-from ..ai_models.athena_model import AthenaModel, AthenaConfig
+from ..ai_models.factory import AIModelFactory
 from ..traffic.generator import TrafficGenerator
 from ..traffic.behavior import BehaviorSimulator
 from ..traffic.phantom_flair_generator import PhantomFlairGenerator, PhantomFlairConfig
@@ -146,40 +142,55 @@ class TrafficFlou:
             
             # Initialize OpenAI model if configured
             if self.config.openai_api_key:
-                openai_model = OpenAIModel(
-                    model_name=self.config.openai_model_name,
-                    api_key=self.config.openai_api_key
+                openai_model = AIModelFactory.create_model(
+                    ModelType.OPENAI,
+                    api_key=self.config.openai_api_key,
+                    model_name=self.config.openai_model_name
                 )
                 self.ai_models["openai"] = openai_model
                 self.logger.info("OpenAI model initialized", model_name=self.config.openai_model_name)
             
             # Initialize Anthropic model if configured
             if self.config.anthropic_api_key:
-                anthropic_model = AnthropicModel(
-                    model_name=self.config.anthropic_model_name,
-                    api_key=self.config.anthropic_api_key
+                anthropic_model = AIModelFactory.create_model(
+                    ModelType.ANTHROPIC,
+                    api_key=self.config.anthropic_api_key,
+                    model_name=self.config.anthropic_model_name
                 )
                 self.ai_models["anthropic"] = anthropic_model
                 self.logger.info("Anthropic model initialized", model_name=self.config.anthropic_model_name)
             
             # Initialize Athena model if configured
             if self.config.athena_api_key:
-                athena_config = AthenaConfig(
-                    athena_endpoint=self.config.athena_endpoint,
+                athena_model = AIModelFactory.create_model(
+                    ModelType.ATHENA,
                     api_key=self.config.athena_api_key,
+                    model_name=self.config.athena_model_name,
+                    athena_endpoint=self.config.athena_endpoint,
                     model_version=self.config.athena_model_version,
                     phantom_flair_enabled=self.config.phantom_flair_enabled,
                     flair_intensity=self.config.phantom_flair_intensity
-                )
-                athena_model = AthenaModel(
-                    model_name=self.config.athena_model_name,
-                    api_key=self.config.athena_api_key,
-                    config=athena_config
                 )
                 self.ai_models["athena"] = athena_model
                 self.logger.info("Athena model initialized", 
                                model_name=self.config.athena_model_name,
                                phantom_flair_enabled=self.config.phantom_flair_enabled)
+            
+            # Initialize Primal Genesis model (Source) - highest priority
+            try:
+                primal_model = AIModelFactory.create_model(
+                    ModelType.PRIMAL_GENESIS,
+                    primary_provider="athena" if self.config.athena_api_key else "openai",
+                    mystical_mode=True,
+                    enable_phantom_analytics=True,
+                    enable_shadow_tendrils=True,
+                    quantum_entropy_level=42,
+                    ethereal_frequency=144.000
+                )
+                self.ai_models["primal_genesis"] = primal_model
+                self.logger.info("Primal Genesis model initialized (Source)")
+            except Exception as e:
+                self.logger.warning("Primal Genesis model initialization failed", error=str(e))
             
             if not self.ai_models:
                 raise TrafficFlouError("No AI models configured")
@@ -525,8 +536,8 @@ class TrafficFlou:
     def _generate_session_id(self, target_url: str) -> str:
         """Generate a unique session ID."""
         timestamp = str(int(time.time()))
-        url_hash = hashlib.md5(target_url.encode()).hexdigest()[:8]
-        random_suffix = hashlib.md5(timestamp.encode()).hexdigest()[:4]
+        url_hash = uuid.uuid5(uuid.NAMESPACE_URL, target_url).hex[:8]
+        random_suffix = uuid.uuid4().hex[:4]
         return f"session_{url_hash}_{random_suffix}"
     
     async def close(self) -> None:

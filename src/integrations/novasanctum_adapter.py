@@ -31,10 +31,10 @@ import websockets
 from dataclasses import dataclass, field
 from enum import Enum
 
-from ..core.config import MatrixOSConfig
-from ..core.error_handling import MatrixOSError, IntegrationError
-from ..utils.logging import get_logger
-from ..utils.security import QuantumEncryption
+from src.core.config import MatrixOSConfig
+from src.core.error_handling import MatrixOSError, IntegrationError
+from src.utils.logging import get_logger
+from src.utils.security import QuantumEncryption
 
 # Initialize quantum-level logging
 logger = get_logger(__name__, level="QUANTUM")

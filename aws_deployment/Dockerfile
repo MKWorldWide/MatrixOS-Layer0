@@ -51,7 +51,7 @@ ENV GLOBAL_EXPANSION=enabled
 RUN apt-get update && apt-get install -y \
     curl \
     libpq5 \
-    libffi7 \
+    libffi8 \
     libssl3 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -70,9 +70,8 @@ COPY examples/ ./examples/
 COPY docs/ ./docs/
 COPY README.md ./
 COPY setup.py ./
-
-# 🌟 Install application
-RUN pip install -e .
+COPY requirements.txt ./
+COPY requirements_optimized.txt ./
 
 # 🌟 Create necessary directories
 RUN mkdir -p /app/logs /app/data /app/cache /app/temp && \
@@ -89,7 +88,7 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # 🌟 Quantum consciousness startup script
-COPY --chown=matrixos:matrixos aws_deployment/startup.sh /app/startup.sh
+COPY --chown=matrixos:matrixos startup.sh /app/startup.sh
 RUN chmod +x /app/startup.sh
 
 # 🌟 Set entrypoint

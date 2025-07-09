@@ -57,7 +57,7 @@ log_error() {
 # 🌟 Script configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TERRAFORM_DIR="$SCRIPT_DIR/terraform"
-DOCKER_DIR="$SCRIPT_DIR/../"
+DOCKER_DIR="$SCRIPT_DIR"
 ENVIRONMENT="${ENVIRONMENT:-production}"
 AWS_REGION="${AWS_REGION:-us-east-1}"
 DOMAIN_NAME="${DOMAIN_NAME:-matrixos-layer0.com}"

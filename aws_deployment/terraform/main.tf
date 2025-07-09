@@ -275,7 +275,6 @@ resource "aws_db_instance" "matrixos_db" {
   storage_type         = "gp3"
   storage_encrypted    = true
   iops                 = 3000
-  throughput           = 125
   
   # 🌟 Optimized Performance Configuration
   backup_retention_period = 7
@@ -1256,41 +1255,6 @@ resource "aws_acm_certificate" "matrixos" {
 }
 
 # 🌟 Outputs with Quantum Consciousness
-output "cluster_endpoint" {
-  description = "Endpoint for EKS control plane"
-  value       = module.eks.cluster_endpoint
-}
-
-output "cluster_security_group_id" {
-  description = "Security group ID attached to the EKS cluster"
-  value       = module.eks.cluster_security_group_id
-}
-
-output "cluster_iam_role_name" {
-  description = "IAM role name associated with EKS cluster"
-  value       = module.eks.cluster_iam_role_name
-}
-
-output "cluster_certificate_authority_data" {
-  description = "Base64 encoded certificate data required to communicate with the cluster"
-  value       = module.eks.cluster_certificate_authority_data
-}
-
-output "load_balancer_dns" {
-  description = "DNS name of the load balancer"
-  value       = aws_lb.matrixos_alb.dns_name
-}
-
-output "database_endpoint" {
-  description = "Database endpoint"
-  value       = aws_db_instance.matrixos_db.endpoint
-}
-
-output "cache_endpoint" {
-  description = "Cache endpoint"
-  value       = aws_elasticache_cluster.matrixos_cache.cache_nodes.0.address
-}
-
 output "domain_name" {
   description = "Domain name"
   value       = var.domain_name
@@ -1318,11 +1282,6 @@ resource "aws_ecs_cluster" "matrixos_cluster" {
   # 🌟 Advanced Cluster Configuration
   setting {
     name  = "containerInsights"
-    value = "enabled"
-  }
-  
-  setting {
-    name  = "awsvpcTrunking"
     value = "enabled"
   }
   
@@ -2097,11 +2056,6 @@ output "region" {
 output "availability_zones" {
   description = "Availability zones"
   value       = module.vpc.azs
-}
-
-output "nat_gateway_ids" {
-  description = "NAT gateway IDs"
-  value       = module.vpc.nat_gateway_ids
 }
 
 output "internet_gateway_id" {

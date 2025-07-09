@@ -566,3 +566,24 @@ For enterprise support and custom MatrixOS Layer 0 implementations, contact:
 ---
 
 **🌟 Built with MatrixOS Layer 0, Primal Genesis Engine, Athena AI, and Phantom Flair for quantum-level, sophisticated, context-aware traffic generation.** 
+
+## 🛰️ NovaSanctum Integration
+
+**NovaSanctum** is now integrated as a submodule in `external/NovaSanctum`.
+
+- **Purpose:** Modular, quantum-synced expansion for MatrixOS Layer 0, enabling celestial and digital convergence features.
+- **Location:** `external/NovaSanctum`
+- **Update:**
+  ```bash
+  git submodule update --remote --merge
+  ```
+- **Documentation:**
+  - All NovaSanctum code and features are quantum-documented and cross-referenced in `@memories.md` and `docs/matrixos_layer0_integration.md`.
+  - For integration patterns, see `src/integrations/novasanctum.py` (create as needed for adapters/wrappers).
+- **Best Practices:**
+  - Keep NovaSanctum up to date with `git submodule update`
+  - Follow quantum documentation and modularity standards
+
+**For more, see:**
+- [NovaSanctum GitHub](https://github.com/M-K-World-Wide/NovaSanctum)
+- [MatrixOS Layer 0 Integration Guide](docs/matrixos_layer0_integration.md) 

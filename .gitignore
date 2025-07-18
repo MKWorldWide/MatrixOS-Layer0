@@ -1,120 +1,51 @@
-# Terraform
-.terraform/
-*.tfstate
-*.tfstate.*
-.terraform.lock.hcl
-
-# Terraform modules
-aws_deployment/terraform/.terraform/
-
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
 *.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
 *.egg
-MANIFEST
+*.egg-info/
+dist/
+build/
+.eggs/
+*.log
 
 # Virtual environments
+.venv/
 venv/
-env/
 ENV/
-env.bak/
-venv.bak/
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-logs/
-
-# Environment variables
-.env
-.env.local
-.env.production
-
-# AWS
-.aws/
-aws-credentials.csv
-
-# Database
-*.db
-*.sqlite3
-
-# Temporary files
-*.tmp
-*.temp
-
-# API Keys (security)
-api_keys.txt
-secrets.json
-
-# Node modules (if any)
+# Node
 node_modules/
 
-# Coverage reports
-htmlcov/
+# macOS
+.DS_Store
+
+# Test & coverage
 .coverage
-.coverage.*
-coverage.xml
-*.cover
-.hypothesis/
+coverage/
+htmlcov/
 .pytest_cache/
 
-# Jupyter Notebook
-.ipynb_checkpoints
+# Environment
+.env
+.env.*
 
-# pyenv
-.python-version
+# CI/CD
+*.pid
+*.lock
 
-# pipenv
-Pipfile.lock
+# Submodules
+.gitmodules
+.git/
 
-# PEP 582
-__pypackages__/
+# Editor
+.idea/
+.vscode/
 
-# Celery
-celerybeat-schedule
-celerybeat.pid
+# Misc
+*.swp
+*.bak
+*.tmp
 
-# SageMath parsed files
-*.sage.py
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json 
+# Ignore local config
+config.local.*

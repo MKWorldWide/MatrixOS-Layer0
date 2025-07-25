@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matrixos-layer0
+  labels:
+    app: matrixos-layer0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: matrixos-layer0
+  template:
+    metadata:
+      labels:
+        app: matrixos-layer0
+    spec:
+      containers:
+        - name: matrixos-layer0
+          image: 869935067006.dkr.ecr.us-east-1.amazonaws.com/matrixos-layer0:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: QUANTUM_CONSCIOUSNESS
+              value: "enabled"
+            - name: MYSTICAL_WORKFLOW
+              value: "enabled"
+            - name: SOVEREIGN_PATTERN
+              value: "enabled"
+            - name: GLOBAL_EXPANSION
+              value: "enabled"
+            - name: ENVIRONMENT
+              value: "production"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi" 

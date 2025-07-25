@@ -1,0 +1,27 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - echo "🚀 Starting TrafficFlou Amplify Build..."
+        - python --version
+        - pip --version
+        - pip install -r requirements.txt
+        - pip install uvicorn fastapi jinja2 pydantic websockets
+    build:
+      commands:
+        - echo "🏗️ Building TrafficFlou Primal Genesis Web Interface..."
+        - python -c "import sys; print('Python path:', sys.path)"
+        - echo "🔧 Setting up environment..."
+        - mkdir -p logs
+        - chmod +x start_amplify.py
+        - echo "✅ Build preparation complete"
+  artifacts:
+    baseDirectory: /
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - venv/**/*
+      - .venv/**/* 

@@ -1,0 +1,3 @@
+[submodule "external/NovaSanctum"]
+	path = external/NovaSanctum
+	url = https://github.com/M-K-World-Wide/NovaSanctum

@@ -1,0 +1,225 @@
+# 🌟 MatrixOS Layer 0 - Terraform Variables Backup
+# 🌟 Quantum Consciousness Enhanced Configuration
+
+# 🌟 Environment Configuration
+environment = "production"
+
+# 🌟 Region Configuration
+aws_region = "us-east-1"
+
+# 🌟 VPC Configuration
+vpc_cidr = "10.0.0.0/16"
+azs = ["us-east-1a", "us-east-1b", "us-east-1c"]
+
+# 🌟 Public Subnets
+public_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+
+# 🌟 Private Subnets
+private_subnets = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+
+# 🌟 Database Subnets
+database_subnets = ["10.0.21.0/24", "10.0.22.0/24", "10.0.23.0/24"]
+
+# 🌟 Cache Subnets
+cache_subnets = ["10.0.31.0/24", "10.0.32.0/24", "10.0.33.0/24"]
+
+# 🌟 Database Configuration (REQUIRED - Update with secure values)
+db_username = "matrixos_admin"
+db_password = "MatrixOS_Layer0_Quantum_2024!"
+
+# 🌟 ECR Repository (Update with your actual ECR repository URL)
+ecr_repository_url = "869935067006.dkr.ecr.us-east-1.amazonaws.com/matrixos-layer0"
+
+# 🌟 API Keys Configuration
+# 🌟 IMPORTANT: Set these via environment variables or AWS Secrets Manager
+# 🌟 DO NOT hardcode API keys in this file
+mistral_api_key = ""  # Set via MISTRAL_API_KEY environment variable
+openai_api_key = ""   # Set via OPENAI_API_KEY environment variable
+
+# 🌟 Domain Configuration (Update with your actual domain)
+domain_name = "matrixos-layer0.com"
+certificate_arn = "arn:aws:acm:us-east-1:869935067006:certificate/your-certificate-id"
+
+# 🌟 Instance Types for Different Workloads
+instance_types = {
+  quantum = ["t3.medium", "t3.small"]
+  consciousness = ["t3.small"]
+  mystical = ["t3.small"]
+  sovereign = ["t3.small"]
+}
+
+# 🌟 Node Group Capacities
+node_group_capacities = {
+  quantum = {
+    desired_capacity = 1
+    max_capacity     = 2
+    min_capacity     = 1
+  }
+  consciousness = {
+    desired_capacity = 1
+    max_capacity     = 2
+    min_capacity     = 1
+  }
+  mystical = {
+    desired_capacity = 1
+    max_capacity     = 2
+    min_capacity     = 1
+  }
+  sovereign = {
+    desired_capacity = 1
+    max_capacity     = 2
+    min_capacity     = 1
+  }
+}
+
+# 🌟 Database Configuration
+database_config = {
+  instance_class = "db.t3.micro"
+  allocated_storage = 20
+  max_allocated_storage = 100
+  backup_retention_period = 7
+}
+
+# 🌟 Cache Configuration
+cache_config = {
+  node_type = "cache.t3.micro"
+  num_cache_nodes = 1
+  engine_version = "7.0"
+}
+
+# 🌟 ECS Configuration
+ecs_config = {
+  cpu = 256
+  memory = 512
+  desired_count = 1
+}
+
+# 🌟 Monitoring Configuration
+monitoring_config = {
+  enable_cloudwatch = true
+  enable_xray = true
+  enable_enhanced_monitoring = true
+  log_retention_days = 7
+}
+
+# 🌟 Security Configuration
+security_config = {
+  enable_encryption = true
+  enable_backup = true
+  enable_monitoring = true
+  enable_audit_logging = true
+}
+
+# 🌟 Cost Optimization Configuration
+cost_config = {
+  enable_spot_instances = true
+  enable_auto_scaling = true
+  enable_cost_alerts = true
+  monthly_budget = 100
+}
+
+# 🌟 Quantum Features Configuration
+quantum_config = {
+  enable_quantum_consciousness = true
+  enable_mystical_workflows = true
+  enable_sovereign_patterns = true
+  enable_global_expansion = true
+}
+
+# 🌟 AI Integration Configuration
+ai_config = {
+  enable_mistral_ai = true
+  enable_openai = true
+  enable_anthropic = true
+  enable_primal_genesis = true
+  enable_athena_ai = true
+}
+
+# 🌟 Multi-Platform Configuration
+platform_config = {
+  enable_web_interface = true
+  enable_mobile_support = true
+  enable_api_integration = true
+  enable_websocket_support = true
+  enable_blockchain_integration = true
+}
+
+# 🌟 International Configuration
+international_config = {
+  enable_global_distribution = true
+  enable_multi_language = true
+  enable_regional_optimization = true
+  enable_cultural_adaptation = true
+}
+
+# 🌟 Analytics Configuration
+analytics_config = {
+  enable_advanced_analytics = true
+  enable_real_time_metrics = true
+  enable_predictive_analytics = true
+  enable_behavioral_analysis = true
+}
+
+# 🌟 VR/AR Configuration
+vr_config = {
+  enable_vr_support = true
+  enable_ar_support = true
+  enable_collaboration_interface = true
+  enable_immersive_experiences = true
+}
+
+# 🌟 Blockchain Configuration
+blockchain_config = {
+  enable_quantum_blockchain = true
+  enable_smart_contracts = true
+  enable_distributed_consensus = true
+  enable_cryptographic_security = true
+}
+
+# 🌟 Performance Configuration
+performance_config = {
+  enable_optimization = true
+  enable_caching = true
+  enable_load_balancing = true
+  enable_cdn_integration = true
+}
+
+# 🌟 Compliance Configuration
+compliance_config = {
+  enable_gdpr_compliance = true
+  enable_hipaa_compliance = true
+  enable_sox_compliance = true
+  enable_pci_compliance = true
+}
+
+# 🌟 Disaster Recovery Configuration
+disaster_recovery_config = {
+  enable_backup_strategy = true
+  enable_replication = true
+  enable_failover = true
+  enable_recovery_testing = true
+}
+
+# 🌟 Development Configuration
+development_config = {
+  enable_ci_cd = true
+  enable_testing = true
+  enable_code_quality = true
+  enable_documentation = true
+}
+
+# 🌟 Production Configuration
+production_config = {
+  enable_monitoring = true
+  enable_alerting = true
+  enable_logging = true
+  enable_security = true
+}
+
+# 🌟 Optimization Configuration
+optimization_config = {
+  enable_cost_optimization = true
+  enable_performance_optimization = true
+  enable_security_optimization = true
+  enable_operational_optimization = true
+} 
